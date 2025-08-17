@@ -4,6 +4,12 @@ export interface PlantAnalysis {
   light: 'sufficient' | 'insufficient' | 'excessive';
   issues: string[];
   confidence: number;
+  plant_info?: {
+    species: string;
+    common_name: string;
+    confidence: number;
+    type: string;
+  };
   analysis_data?: {
     green_percentage: number;
     yellow_percentage: number;
@@ -85,12 +91,27 @@ class PlantAnalysisService {
 
     const confidence = 75 + Math.random() * 20;
 
+    // Simulate plant identification
+    const plantTypes = [
+      { species: 'Monstera Deliciosa', common_name: 'Swiss Cheese Plant', type: 'monstera' },
+      { species: 'Epipremnum aureum', common_name: 'Pothos', type: 'pothos' },
+      { species: 'Sansevieria trifasciata', common_name: 'Snake Plant', type: 'snake_plant' },
+      { species: 'Unknown Plant', common_name: 'House Plant', type: 'generic' }
+    ];
+    const randomPlant = plantTypes[Math.floor(Math.random() * plantTypes.length)];
+
     return {
       health,
       watering,
       light,
       issues,
       confidence: Math.round(confidence),
+      plant_info: {
+        species: randomPlant.species,
+        common_name: randomPlant.common_name,
+        confidence: Math.round(confidence * 0.8),
+        type: randomPlant.type
+      },
       analysis_data: {
         green_percentage: 70 + Math.random() * 20,
         yellow_percentage: 2 + Math.random() * 8,

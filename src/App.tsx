@@ -328,6 +328,27 @@ function App() {
               Plant Analysis
             </h2>
             
+            {/* Plant Identification */}
+            {analysis.plant_info && (
+              <div style={{padding: '0.75rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '0.5rem', marginBottom: '1rem'}}>
+                <h3 style={{fontWeight: '600', color: '#166534', marginBottom: '0.5rem', display: 'flex', alignItems: 'center'}}>
+                  <Leaf style={{width: '20px', height: '20px', marginRight: '0.5rem'}} />
+                  Plant Identified
+                </h3>
+                <div style={{fontSize: '0.875rem', color: '#15803d'}}>
+                  <div style={{marginBottom: '0.25rem'}}>
+                    <strong>Species:</strong> {analysis.plant_info.species}
+                  </div>
+                  <div style={{marginBottom: '0.25rem'}}>
+                    <strong>Common Name:</strong> {analysis.plant_info.common_name}
+                  </div>
+                  <div>
+                    <strong>Identification Confidence:</strong> {analysis.plant_info.confidence}%
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div>
               <div className="analysis-item">
                 <span style={{fontWeight: '500'}}>Health Status:</span>
@@ -362,7 +383,7 @@ function App() {
               </div>
 
               <div className="analysis-item">
-                <span style={{fontWeight: '500'}}>Confidence: </span>
+                <span style={{fontWeight: '500'}}>Analysis Confidence: </span>
                 <span style={{fontWeight: '600'}}>{analysis.confidence.toFixed(1)}%</span>
               </div>
 
