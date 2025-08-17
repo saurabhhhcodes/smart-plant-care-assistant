@@ -30,8 +30,8 @@ class PlantAnalysisService {
   private apiUrl: string;
 
   private constructor() {
-    // Use Python backend if available, otherwise fallback to frontend analysis
-    this.apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    // Use Replit backend if available, otherwise fallback to localhost
+    this.apiUrl = process.env.REACT_APP_API_URL || 'https://plant-care-assistant-backend.saurabhhhcodes.repl.co';
   }
 
   public static getInstance(): PlantAnalysisService {
@@ -43,7 +43,7 @@ class PlantAnalysisService {
 
   public async analyzePlantImage(imageData: string): Promise<PlantAnalysis> {
     try {
-      // Try to use Python backend first
+      // Try to use Replit backend first
       const response = await fetch(`${this.apiUrl}/api/analyze`, {
         method: 'POST',
         headers: {
@@ -56,17 +56,17 @@ class PlantAnalysisService {
         const result: AnalysisResponse = await response.json();
         return result.analysis;
       } else {
-        console.warn('Python backend not available, using frontend analysis');
+        console.warn('Replit backend not available, using frontend analysis');
         return this.fallbackAnalysis(imageData);
       }
     } catch (error) {
-      console.warn('Python backend error, using frontend analysis:', error);
+      console.warn('Replit backend error, using frontend analysis:', error);
       return this.fallbackAnalysis(imageData);
     }
   }
 
   private fallbackAnalysis(imageData: string): PlantAnalysis {
-    // Fallback to frontend analysis if Python backend is not available
+    // Fallback to frontend analysis if Replit backend is not available
     const healthOptions: Array<'excellent' | 'good' | 'fair' | 'poor'> = ['excellent', 'good', 'fair', 'poor'];
     const wateringOptions: Array<'needed' | 'adequate' | 'excessive'> = ['needed', 'adequate', 'excessive'];
     const lightOptions: Array<'sufficient' | 'insufficient' | 'excessive'> = ['sufficient', 'insufficient', 'excessive'];
