@@ -1,22 +1,39 @@
 # Cleanup script for Smart Plant Care Assistant
-# This script removes unnecessary files from the project
+# Removes unnecessary files before committing to GitHub
 
-# Remove React frontend files
-Remove-Item -Recurse -Force -Path "public" -ErrorAction SilentlyContinue
-Remove-Item -Recurse -Force -Path "src" -ErrorAction SilentlyContinue
-Remove-Item -Force "package.json" -ErrorAction SilentlyContinue
-Remove-Item -Force "package-lock.json" -ErrorAction SilentlyContinue
-Remove-Item -Force "tsconfig.json" -ErrorAction SilentlyContinue
-Remove-Item -Force "tailwind.config.js" -ErrorAction SilentlyContinue
-Remove-Item -Force "postcss.config.js" -ErrorAction SilentlyContinue
-Remove-Item -Force "start.bat" -ErrorAction SilentlyContinue
+# Files to remove
+$filesToRemove = @(
+    "check_env.py",
+    "check_python.bat",
+    "setup_and_run.bat",
+    "setup_and_run.ps1",
+    "test_plant_care.py",
+    "test_python.py"
+)
 
-# Remove backend files that are no longer needed
-Remove-Item -Recurse -Force -Path "backend" -ErrorAction SilentlyContinue
+# Folders to remove
+$foldersToRemove = @(
+    "__pycache__"
+)
 
-# Remove deployment files that are no longer needed
-Remove-Item -Force "Dockerfile" -ErrorAction SilentlyContinue
-Remove-Item -Force "REPLIT_DEPLOYMENT.md" -ErrorAction SilentlyContinue
+# Remove files
+foreach ($file in $filesToRemove) {
+    if (Test-Path $file) {
+        Remove-Item $file -Force
+        Write-Host "Removed file: $file"
+    }
+}
 
-Write-Host "Cleanup completed. The following essential files remain:"
-Get-ChildItem -File -Recurse | Select-Object FullName
+# Remove folders
+foreach ($folder in $foldersToRemove) {
+    if (Test-Path $folder) {
+        Remove-Item $folder -Recurse -Force
+        Write-Host "Removed folder: $folder"
+    }
+}
+
+Write-Host "\nCleanup complete! The project is now ready for GitHub."
+Write-Host "Run these commands to push to GitHub:"
+Write-Host "1. git add ."
+Write-Host "2. git commit -m 'Initial commit'"
+Write-Host "3. git push origin main"

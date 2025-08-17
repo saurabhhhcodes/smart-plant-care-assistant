@@ -1,5 +1,76 @@
 # 🌱 Smart Plant Care Assistant
 
+A Streamlit-based application that helps you take care of your plants using AI-powered image analysis and chat assistance.
+
+## Features
+
+- 📸 Upload plant images for health analysis
+- 💬 Chat with an AI plant care assistant
+- 🌿 Get personalized care recommendations
+- 🔍 Identify plant health issues
+
+## Prerequisites
+
+- Python 3.8+
+- Ollama (for local AI processing)
+- Git (for version control)
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/smart-plant-care-assistant.git
+   cd smart-plant-care-assistant
+   ```
+
+2. Install the required Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Install and set up Ollama:
+   - Download and install from [Ollama's website](https://ollama.ai/)
+   - Pull the required model (llama3 is recommended):
+     ```bash
+     ollama pull llama3
+     ```
+
+4. Create a `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+   Edit the `.env` file with your configuration if needed.
+
+## Usage
+
+1. Start the Ollama server (if not already running):
+   ```bash
+   ollama serve
+   ```
+
+2. In a new terminal, run the Streamlit app:
+   ```bash
+   streamlit run app.py
+   ```
+
+3. Open your browser and navigate to `http://localhost:8501`
+
+## Project Structure
+
+- `app.py` - Main Streamlit application
+- `full_plant_agent.py` - Core AI agent implementation
+- `plant_analysis.py` - Image analysis functionality
+- `requirements.txt` - Python dependencies
+- `.env.example` - Environment variables template
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 A powerful AI-powered application that uses **computer vision** and **large language models** to analyze plant health and provide personalized care recommendations. Built with Python and Streamlit for a seamless user experience.
 
 ## 🚀 Features
