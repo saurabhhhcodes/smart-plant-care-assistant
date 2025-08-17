@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "plant-care-assistant-backend"
+version = "0.1.0"
+description = "AI-powered plant care assistant backend with computer vision"
+authors = ["Saurabh <saurabhhhcodes@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+flask = "^2.3.3"
+flask-cors = "^4.0.0"
+opencv-python = "^4.8.1.78"
+numpy = "^1.24.3"
+pillow = "^10.0.1"
+python-dotenv = "^1.0.0"
+requests = "^2.31.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
