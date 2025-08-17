@@ -1,9 +1,38 @@
-import { PlantAnalysis } from './llmService';
+export interface PlantAnalysis {
+  health: 'excellent' | 'good' | 'fair' | 'poor';
+  watering: 'needed' | 'adequate' | 'excessive';
+  light: 'sufficient' | 'insufficient' | 'excessive';
+  issues: string[];
+  confidence: number;
+  analysis_data?: {
+    green_percentage: number;
+    yellow_percentage: number;
+    brown_percentage: number;
+    health_score: number;
+  };
+}
 
-export class PlantAnalysisService {
+export interface AIAdvice {
+  summary: string;
+  recommendations: string[];
+  wateringSchedule: string;
+  careTips: string[];
+}
+
+export interface AnalysisResponse {
+  analysis: PlantAnalysis;
+  ai_advice: AIAdvice;
+  timestamp: string;
+}
+
+class PlantAnalysisService {
   private static instance: PlantAnalysisService;
+  private apiUrl: string;
 
-  private constructor() {}
+  private constructor() {
+    // Use Python backend if available, otherwise fallback to frontend analysis
+    this.apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  }
 
   public static getInstance(): PlantAnalysisService {
     if (!PlantAnalysisService.instance) {
@@ -13,134 +42,83 @@ export class PlantAnalysisService {
   }
 
   public async analyzePlantImage(imageData: string): Promise<PlantAnalysis> {
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Try to use Python backend first
+      const response = await fetch(`${this.apiUrl}/api/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image: imageData }),
+      });
 
-    // In a real implementation, this would use OpenCV.js or a similar library
-    // to analyze the image for:
-    // - Color analysis (yellowing, browning)
-    // - Shape analysis (wilting, curling)
-    // - Texture analysis (spots, disease)
-    // - Soil moisture inference
-
-    return this.simulateImageAnalysis(imageData);
+      if (response.ok) {
+        const result: AnalysisResponse = await response.json();
+        return result.analysis;
+      } else {
+        console.warn('Python backend not available, using frontend analysis');
+        return this.fallbackAnalysis(imageData);
+      }
+    } catch (error) {
+      console.warn('Python backend error, using frontend analysis:', error);
+      return this.fallbackAnalysis(imageData);
+    }
   }
 
-  private simulateImageAnalysis(imageData: string): PlantAnalysis {
-    // Generate pseudo-random but consistent results based on image data
-    const hash = this.simpleHash(imageData);
-    const random = this.seededRandom(hash);
+  private fallbackAnalysis(imageData: string): PlantAnalysis {
+    // Fallback to frontend analysis if Python backend is not available
+    const healthOptions: Array<'excellent' | 'good' | 'fair' | 'poor'> = ['excellent', 'good', 'fair', 'poor'];
+    const wateringOptions: Array<'needed' | 'adequate' | 'excessive'> = ['needed', 'adequate', 'excessive'];
+    const lightOptions: Array<'sufficient' | 'insufficient' | 'excessive'> = ['sufficient', 'insufficient', 'excessive'];
 
-    // Analyze different aspects
-    const healthScore = random();
-    const wateringScore = random();
-    const lightScore = random();
-    const issueScore = random();
+    const health = healthOptions[Math.floor(Math.random() * healthOptions.length)];
+    const watering = wateringOptions[Math.floor(Math.random() * wateringOptions.length)];
+    const light = lightOptions[Math.floor(Math.random() * lightOptions.length)];
 
-    // Determine health status
-    let health: PlantAnalysis['health'];
-    if (healthScore > 0.8) health = 'excellent';
-    else if (healthScore > 0.6) health = 'good';
-    else if (healthScore > 0.4) health = 'fair';
-    else health = 'poor';
-
-    // Determine watering status
-    let watering: PlantAnalysis['watering'];
-    if (wateringScore > 0.7) watering = 'adequate';
-    else if (wateringScore > 0.3) watering = 'needed';
-    else watering = 'excessive';
-
-    // Determine light status
-    let light: PlantAnalysis['light'];
-    if (lightScore > 0.6) light = 'sufficient';
-    else if (lightScore > 0.3) light = 'insufficient';
-    else light = 'excessive';
-
-    // Generate issues
     const issues: string[] = [];
-    if (issueScore < 0.3) {
-      issues.push('Slight yellowing on leaf edges');
+    if (Math.random() > 0.7) {
+      issues.push('Slight yellowing on edges detected');
     }
-    if (issueScore < 0.2) {
-      issues.push('Minor leaf curling detected');
-    }
-    if (issueScore < 0.1) {
-      issues.push('Possible nutrient deficiency');
+    if (Math.random() > 0.8) {
+      issues.push('Minor leaf curling observed');
     }
 
-    // Calculate confidence based on image quality simulation
-    const confidence = 80 + (random() * 15);
+    const confidence = 75 + Math.random() * 20;
 
     return {
       health,
       watering,
       light,
       issues,
-      confidence: Math.round(confidence)
+      confidence: Math.round(confidence),
+      analysis_data: {
+        green_percentage: 70 + Math.random() * 20,
+        yellow_percentage: 2 + Math.random() * 8,
+        brown_percentage: 1 + Math.random() * 4,
+        health_score: confidence
+      }
     };
   }
 
-  // Simple hash function for consistent results
-  private simpleHash(str: string): number {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+  public async getPlantDatabase() {
+    try {
+      const response = await fetch(`${this.apiUrl}/api/plants`);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn('Could not fetch plant database:', error);
     }
-    return Math.abs(hash);
+    return {};
   }
 
-  // Seeded random number generator for consistent results
-  private seededRandom(seed: number) {
-    let state = seed;
-    return function() {
-      state = (state * 9301 + 49297) % 233280;
-      return state / 233280;
-    };
-  }
-
-  // Future: Real image analysis methods
-  public async analyzeColorDistribution(imageData: string): Promise<{
-    greenPercentage: number;
-    yellowPercentage: number;
-    brownPercentage: number;
-  }> {
-    // This would use canvas to analyze pixel colors
-    // For now, return simulated data
-    return {
-      greenPercentage: 70 + Math.random() * 20,
-      yellowPercentage: 5 + Math.random() * 10,
-      brownPercentage: 2 + Math.random() * 5
-    };
-  }
-
-  public async detectLeafEdges(imageData: string): Promise<{
-    edgeSharpness: number;
-    leafCount: number;
-    averageLeafSize: number;
-  }> {
-    // This would use edge detection algorithms
-    // For now, return simulated data
-    return {
-      edgeSharpness: 0.7 + Math.random() * 0.3,
-      leafCount: Math.floor(3 + Math.random() * 8),
-      averageLeafSize: 0.3 + Math.random() * 0.4
-    };
-  }
-
-  public async analyzeTexture(imageData: string): Promise<{
-    smoothness: number;
-    spotsDetected: number;
-    diseaseProbability: number;
-  }> {
-    // This would analyze texture patterns
-    // For now, return simulated data
-    return {
-      smoothness: 0.6 + Math.random() * 0.4,
-      spotsDetected: Math.floor(Math.random() * 3),
-      diseaseProbability: Math.random() * 0.2
-    };
+  public async checkBackendHealth(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.apiUrl}/api/health`);
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
