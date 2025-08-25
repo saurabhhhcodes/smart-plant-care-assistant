@@ -65,20 +65,20 @@ class PlantCareAgent:
         """Initialize the language model based on the provider."""
         if self.provider == "openai":
             return ChatOpenAI(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",  # latest stable OpenAI model
                 api_key=self.api_key,
                 temperature=0.7
             )
         elif self.provider == "anthropic":
             return ChatAnthropic(
-                model="claude-3-opus-20240229",
+                model="claude-3-opus-20240229",  # latest Claude 3 Opus
                 anthropic_api_key=self.api_key,
                 temperature=0.7
             )
         elif self.provider == "together":
             if TogetherLLM is not None:
                 return TogetherLLM(
-                    model="meta-llama/Llama-3-70b-chat-hf",
+                    model="meta-llama/Llama-3-70b-chat-hf",  # Llama 3 70B
                     together_api_key=self.api_key,
                     temperature=0.7
                 )
@@ -86,13 +86,13 @@ class PlantCareAgent:
                 raise ImportError("TogetherLLM is not available in this version of langchain_together. Please update your requirements or code.")
         elif self.provider == "ollama":
             if Ollama is not None:
-                return Ollama(model="llama2", temperature=0.7)
+                return Ollama(model="llama3", temperature=0.7)  # Llama 3 is latest in Ollama
             else:
                 raise ImportError("Ollama is not available. Please install langchain_community and run an Ollama server.")
         elif self.provider == "cohere":
             if ChatCohere is not None:
                 return ChatCohere(
-                    model="command-r-plus",
+                    model="command-r-plus",  # latest Cohere command model
                     cohere_api_key=self.api_key,
                     temperature=0.7
                 )
@@ -101,7 +101,7 @@ class PlantCareAgent:
         elif self.provider == "gemini":
             if ChatGoogleGenerativeAI is not None:
                 return ChatGoogleGenerativeAI(
-                    model="gemini-pro",
+                    model="models/gemini-1.5-pro-latest",  # latest Gemini model as of 2025
                     google_api_key=self.api_key,
                     temperature=0.7
                 )
@@ -110,7 +110,7 @@ class PlantCareAgent:
         elif self.provider == "mistral":
             if ChatMistralAI is not None:
                 return ChatMistralAI(
-                    model="mistral-medium",
+                    model="mistral-large-latest",  # latest Mistral model
                     mistral_api_key=self.api_key,
                     temperature=0.7
                 )
@@ -119,7 +119,7 @@ class PlantCareAgent:
         elif self.provider == "perplexity":
             if ChatPerplexity is not None:
                 return ChatPerplexity(
-                    model="pplx-70b-online",
+                    model="pplx-70b-online",  # latest Perplexity model
                     perplexity_api_key=self.api_key,
                     temperature=0.7
                 )
@@ -128,7 +128,7 @@ class PlantCareAgent:
         elif self.provider == "huggingface":
             if HuggingFaceHub is not None:
                 return HuggingFaceHub(
-                    repo_id="HuggingFaceH4/zephyr-7b-beta",
+                    repo_id="HuggingFaceH4/zephyr-7b-beta",  # Zephyr 7B Beta is a strong open model
                     huggingfacehub_api_token=self.api_key
                 )
             else:
@@ -136,7 +136,7 @@ class PlantCareAgent:
         else:
             # Default to OpenAI if no provider specified
             return ChatOpenAI(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 api_key=self.api_key,
                 temperature=0.7
             )
