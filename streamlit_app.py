@@ -52,10 +52,15 @@ def display_sidebar():
         st.subheader("LLM Provider")
         provider = st.selectbox(
             "Select Provider",
-            ["openai", "anthropic", "together"],
+            ["openai", "anthropic", "together", "ollama (open source LLMs)",],
             index=0,
             help="Select the LLM provider to use for analysis"
         )
+        # Normalize provider value for backend
+        if provider.startswith("ollama"):
+            st.session_state.provider = "ollama"
+        else:
+            st.session_state.provider = provider
         st.session_state.provider = provider
         
         # API key input

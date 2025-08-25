@@ -8,12 +8,17 @@ import io
 import cv2
 
 # LangChain imports
+
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 try:
     from langchain_together import TogetherLLM
 except ImportError:
     TogetherLLM = None  # Fallback for unsupported versions
+try:
+    from langchain_community.llms import Ollama
+except ImportError:
+    Ollama = None
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -59,6 +64,12 @@ class PlantCareAgent:
                 )
             else:
                 raise ImportError("TogetherLLM is not available in this version of langchain_together. Please update your requirements or code.")
+        elif self.provider == "ollama":
+            # Open source LLMs via Ollama (local or remote)
+            if Ollama is not None:
+                return Ollama(model="llama2", temperature=0.7)  # You can change model name as needed
+            else:
+                raise ImportError("Ollama is not available. Please install langchain_community and run an Ollama server.")
         else:
             # Default to OpenAI if no provider specified
             return ChatOpenAI(
