@@ -246,24 +246,12 @@ class PlantCareAgent:
         return datetime.now().isoformat()
     
     def chat(self, message: str, chat_history: list = None) -> str:
-        """Process a chat message and return a response.
-        
-        Args:
-            message: User's message
-            chat_history: List of previous messages in the conversation
-            
-        Returns:
-            Response from the LLM
-        """
+        """Process a chat message and return a response, ensuring UTF-8 encoding for emojis and non-ASCII."""
         try:
-            # Create a conversation history for context
             messages = []
-            
-            # Add system message
             messages.append(SystemMessage(content="""
             You are a helpful plant care assistant. Your goal is to help users take care of their plants 
             by providing accurate and helpful information about plant care, diagnosing issues, and offering recommendations.
-            
             When users ask about plant care, consider:
             - Watering needs (frequency, amount, technique)
             - Light requirements (direct, indirect, low, high)
@@ -273,24 +261,26 @@ class PlantCareAgent:
             - Seasonal care adjustments
             - Pest identification and treatment
             - Disease prevention and treatment
-            
             Always provide specific, actionable advice based on the plant type if mentioned.
             """))
-            
-            # Add chat history if provided
             if chat_history:
                 for msg in chat_history:
                     if msg["role"] == "user":
                         messages.append(HumanMessage(content=msg["content"]))
                     else:
                         messages.append(SystemMessage(content=msg["content"]))
-            
-            # Add the current message
             messages.append(HumanMessage(content=message))
-            
-            # Get response from the LLM
             response = self.llm.invoke(messages)
-            return response.content
+            # Ensure the response is always returned as a UTF-8 string
+            if hasattr(response, 'content'):
+                if isinstance(response.content, bytes):
+                    return response.content.decode('utf-8', errors='replace')
+                else:
+                    return str(response.content)
+            elif isinstance(response, bytes):
+                return response.decode('utf-8', errors='replace')
+            else:
+                return str(response)
         except Exception as e:
             return f"I encountered an error: {str(e)}. Please try again with a different query."
     
