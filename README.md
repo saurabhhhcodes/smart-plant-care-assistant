@@ -1,25 +1,50 @@
 # 🌱 Smart Plant Care Assistant
 
-A Streamlit-based application that helps you take care of your plants using AI-powered image analysis and chat assistance.
+A Streamlit-based application that helps you take care of your plants using AI-powered image analysis and chat assistance with real LLMs.
 
-## Features
+## 🚀 Features
 
-- 📸 Upload plant images for health analysis
-- 💬 Chat with an AI plant care assistant
-- 🌿 Get personalized care recommendations
-- 🔍 Identify plant health issues
+- 📸 **Upload plant images** for health analysis with confidence scores
+- 💬 **Chat with an AI plant care assistant** using real LLMs
+- 🌿 **Get personalized care recommendations** based on analysis
+- 🔍 **Identify plant health issues** with detailed diagnostics
+- 🌐 **Supports multiple LLM providers** (OpenAI, Anthropic, Meta, etc.)
+- 📱 **Mobile-friendly interface** for on-the-go plant care
 
-## Prerequisites
+## 🎯 Evaluation & Prediction Confidences
+
+Our plant analysis system provides confidence scores for all predictions:
+
+### Computer Vision Analysis
+- **Health Score**: Overall plant health percentage (0-100%)
+- **Color Analysis**: 
+  - Healthy green: Confidence percentage
+  - Yellowing: Confidence percentage
+  - Browning: Confidence percentage
+- **Disease Detection**: Confidence percentages for common plant diseases
+- **Leaf Count**: Estimated number of leaves with accuracy indicator
+
+### LLM-Based Recommendations
+- **Care Recommendations**: Generated with confidence based on analysis
+- **Chat Responses**: Context-aware responses with relevance scoring
+- **Plant Identification**: Species identification confidence percentages
+
+### Confidence Levels Explained
+- **High (80-100%)**: Very confident in the prediction
+- **Medium (60-79%)**: Moderately confident, consider additional factors
+- **Low (40-59%)**: Low confidence, verification recommended
+- **Very Low (0-39%)**: Very low confidence, manual inspection advised
+
+## 🛠️ Prerequisites
 
 - Python 3.8+
-- Ollama (for local AI processing)
-- Git (for version control)
+- API key from one of the supported LLM providers
 
-## Installation
+## 📦 Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/smart-plant-care-assistant.git
+   git clone https://github.com/saurabhhhcodes/smart-plant-care-assistant.git
    cd smart-plant-care-assistant
    ```
 
@@ -28,290 +53,63 @@ A Streamlit-based application that helps you take care of your plants using AI-p
    pip install -r requirements.txt
    ```
 
-3. Install and set up Ollama:
-   - Download and install from [Ollama's website](https://ollama.ai/)
-   - Pull the required model (llama3 is recommended):
-     ```bash
-     ollama pull llama3
-     ```
-
-4. Create a `.env` file:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit the `.env` file with your configuration if needed.
-
-## Usage
-
-1. Start the Ollama server (if not already running):
-   ```bash
-   ollama serve
-   ```
-
-2. In a new terminal, run the Streamlit app:
-   ```bash
-   streamlit run app.py
-   ```
-
-3. Open your browser and navigate to `http://localhost:8501`
-
-## Project Structure
-
-- `app.py` - Main Streamlit application
-- `full_plant_agent.py` - Core AI agent implementation
-- `plant_analysis.py` - Image analysis functionality
-- `requirements.txt` - Python dependencies
-- `.env.example` - Environment variables template
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-A powerful AI-powered application that uses **computer vision** and **large language models** to analyze plant health and provide personalized care recommendations. Built with Python and Streamlit for a seamless user experience.
-
-## 🚀 Features
-
-### 📷 Camera-First Analysis
-- **Real-time Camera Integration**: Analyze plants directly using your device's camera
-- **Automatic Analysis**: Set custom intervals for continuous monitoring
-- **Instant Feedback**: Get immediate health assessments and care recommendations
-
-### 🤖 AI-Powered Insights
-- **Plant Health Analysis**: Comprehensive health status with confidence scores
-- **Species Identification**: Automatic plant type detection
-- **Issue Detection**: Identify common plant problems
-- **Personalized Care Advice**: Get tailored recommendations for your plants
-- **Chat Interface**: Ask questions about plant care in natural language
-
-### 🛠️ Technical Features
-- **Local AI Processing**: Uses Ollama for privacy-focused local inference
-- **Computer Vision**: Advanced image analysis with OpenCV
-- **Streamlit UI**: Clean, responsive interface that works on any device
-- **Asynchronous Processing**: Smooth user experience with background analysis
-
-## 🛠️ Technology Stack
-
-### Core Technologies
-- **Python 3.8+**
-- **Streamlit** for the web interface
-- **Ollama** for local LLM inference
-- **OpenCV** for computer vision
-- **LangChain** for AI agent orchestration
-- **LangGraph** for workflow management
-
-### Key Dependencies
-- **Pillow** for image processing
-- **NumPy** for numerical operations
-- **python-dotenv** for environment management
-- **requests** for API calls
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.8 or higher
-- [Ollama](https://ollama.ai/) installed and running
-- Webcam (for camera analysis)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/saurabhhhcodes/smart-plant-care-assistant.git
-   cd smart-plant-care-assistant
-   ```
-
-2. **Create and activate a virtual environment** (recommended)
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Download Ollama models**
-   ```bash
-   ollama pull llama3
-   ```
-
-5. **Run the application**
-   ```bash
-   streamlit run app.py
-   ```
-
-The application will be available at `http://localhost:8501`
+3. Set up your API keys in the application (no need to set environment variables)
 
 ## 🎯 Usage
 
-### Camera Analysis (Recommended)
-1. Click the "Toggle Camera" button to start your camera
-2. Position your plant in the frame
-3. The app will automatically analyze the plant at regular intervals
-4. View real-time analysis results including health status and care recommendations
+1. Run the Streamlit app:
+   ```bash
+   streamlit run streamlit_app.py
+   ```
 
-### Photo Upload (Alternative Method)
-1. Switch to the "Upload Photo" tab
-2. Click "Browse files" or drag and drop an image
-3. Click "Analyze Plant" to process the image
-4. View detailed analysis results
+2. Open your browser and navigate to `http://localhost:8501`
 
-### Chat with the Plant Expert
-1. Scroll down to the chat interface
-2. Ask any plant care questions in natural language
-3. Get AI-powered responses based on the latest plant analysis
+3. Select your preferred LLM provider and enter your API key in the sidebar
 
-### Understanding the Analysis
-- **Health Status**: Overall plant health with confidence score
-- **Plant Type**: Identified species with confidence level
-- **Potential Issues**: Any detected problems
-- **Care Recommendations**: Personalized advice for your plant
-- **AI Advice**: Personalized care recommendations
+4. Upload a photo of your plant or use the camera feature
 
-## 🔧 API Endpoints
+5. View analysis results with confidence scores
 
-### POST /api/analyze
-Analyze a plant image and get health recommendations.
+6. Chat with the AI assistant for personalized care advice
 
-**Request:**
-```json
-{
-  "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
-}
-```
+## 🤖 Supported LLM Providers
 
-**Response:**
-```json
-{
-  "analysis": {
-    "health": "good",
-    "watering": "adequate",
-    "light": "sufficient",
-    "issues": [],
-    "confidence": 85,
-    "analysis_data": {
-      "green_percentage": 75.2,
-      "yellow_percentage": 2.1,
-      "brown_percentage": 1.5,
-      "health_score": 85.0
-    }
-  },
-  "ai_advice": {
-    "summary": "Your plant appears to be in good condition...",
-    "recommendations": [...],
-    "watering_schedule": "Continue current schedule",
-    "care_tips": [...]
-  }
-}
-```
+- **OpenAI**: GPT-3.5, GPT-4, GPT-4 Turbo
+- **Anthropic**: Claude models (Claude 3 Opus, Sonnet, Haiku)
+- **Meta**: Llama models through Together.ai (Llama 3, Llama 2)
+- **Other providers**: Additional models via Together.ai integration
 
-### GET /api/health
-Health check endpoint.
-
-### GET /api/plants
-Get common plant care information.
-
-## 🏗️ Project Structure
-
-```
-smart-plant-care-assistant/
-├── src/                    # React frontend source
-│   ├── services/          # API services
-│   ├── App.tsx           # Main component
-│   └── index.tsx         # App entry point
-├── backend/               # Python Flask backend
-│   ├── app.py            # Main Flask application
-│   ├── requirements.txt  # Python dependencies
-│   └── README.md        # Backend documentation
-├── public/               # Static assets
-├── package.json          # Frontend dependencies
-└── README.md            # This file
-```
-
-## 🚀 Deployment
-
-### Frontend (GitHub Pages)
-```bash
-# Build for production
-npm run build
-
-# Deploy to GitHub Pages
-npm run deploy
-```
-
-### Backend (Production)
-```bash
-# Install gunicorn
-pip install gunicorn
-
-# Deploy with gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
-```
-
-## 🔍 Analysis Features
+## 📊 Analysis Features
 
 ### Computer Vision Analysis
-- **Green Detection**: Healthy plant tissue analysis
-- **Yellow Detection**: Stress, nutrient deficiency, overwatering
-- **Brown Detection**: Disease, death, severe damage
-- **Color Distribution**: Percentage analysis of plant colors
-
-### Health Scoring Algorithm
-- **Excellent**: 80%+ health score
-- **Good**: 60-79% health score
-- **Fair**: 40-59% health score
-- **Poor**: <40% health score
+- **Health Assessment**: Overall plant condition with confidence score
+- **Color Distribution**: Green, yellow, and brown percentage analysis
+- **Disease Detection**: Identification of common plant diseases
+- **Growth Monitoring**: Track plant health over time
 
 ### AI Recommendations
-- Personalized watering schedules
-- Light condition advice
-- Care tips and best practices
-- Issue-specific solutions
-- Plant-specific care information
+- **Watering Schedule**: Personalized watering advice
+- **Light Requirements**: Optimal lighting conditions
+- **Nutrient Needs**: Fertilization recommendations
+- **Problem Solutions**: Specific solutions for detected issues
 
-## 🎨 UI/UX Features
+## ☁️ Deployment
 
-### Mobile Optimization
-- Touch-friendly interface
-- Camera integration
-- Responsive design
-- Progressive Web App capabilities
+This application is designed to work with Streamlit Cloud. Users can select their preferred LLM provider and enter their API key directly in the application interface.
 
-### Visual Design
-- Plant-inspired color scheme
-- Modern, clean interface
-- Intuitive navigation
-- Loading states and animations
+### Streamlit Cloud Deployment
+1. Fork this repository
+2. Go to [Streamlit Cloud](https://streamlit.io/cloud)
+3. Create a new app using your forked repository
+4. Set the main file path to `streamlit_app.py`
+5. Deploy and share with others
 
-## 🔮 Future Enhancements
+## 🧪 Testing
 
-### Planned Features
-- [ ] Plant species identification
-- [ ] Care history tracking
-- [ ] Push notifications for care reminders
-- [ ] Multiple language support
-- [ ] Social sharing features
-- [ ] Advanced disease detection
-- [ ] Growth tracking over time
-
-### AI Improvements
-- [ ] Fine-tuned plant care models
-- [ ] Disease prediction algorithms
-- [ ] Seasonal care adjustments
-- [ ] Machine learning model training
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+To test the application locally:
+```bash
+streamlit run streamlit_app.py
+```
 
 ## 📝 License
 
@@ -320,19 +118,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - OpenCV for computer vision capabilities
-- React community for the excellent framework
-- Tailwind CSS for the beautiful styling system
+- Streamlit for the excellent web framework
+- LangChain for LLM integration
 - Plant care experts for validation and feedback
-
-## 📞 Support
-
-For support and questions:
-- Create an issue on GitHub
-- Check the documentation
-- Review the troubleshooting guide
 
 ---
 
-**🌱 Keep your plants healthy and happy with AI-powered care! 🌱**
-
-*Built with ❤️ by [Saurabh](https://github.com/saurabhhhcodes)*
+**Keep your plants healthy and happy with AI-powered care! 🌱**
