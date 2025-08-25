@@ -1,4 +1,10 @@
 import streamlit as st
+import sys
+import io
+# Ensure UTF-8 encoding for all output (fixes emoji errors)
+if sys.getdefaultencoding().lower() != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 import os
 import sys
 from pathlib import Path
