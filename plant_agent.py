@@ -39,7 +39,7 @@ class PlantCareAgent:
         """Initialize the language model based on the provider."""
         if self.provider == "openai":
             return ChatOpenAI(
-                model="gpt-4-turbo-preview",
+                model="gpt-3.5-turbo",
                 api_key=self.api_key,
                 temperature=0.7
             )
@@ -62,7 +62,7 @@ class PlantCareAgent:
         else:
             # Default to OpenAI if no provider specified
             return ChatOpenAI(
-                model="gpt-4-turbo-preview",
+                model="gpt-3.5-turbo",
                 api_key=self.api_key,
                 temperature=0.7
             )
