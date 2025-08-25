@@ -246,7 +246,7 @@ class PlantCareAgent:
         return datetime.now().isoformat()
     
     def chat(self, message: str, chat_history: list = None) -> str:
-        """Process a chat message and return a response, ensuring UTF-8 encoding for emojis and non-ASCII."""
+        """Process a chat message and return a response, always forcing UTF-8 encoding for output."""
         try:
             messages = []
             messages.append(SystemMessage(content="""
@@ -271,16 +271,15 @@ class PlantCareAgent:
                         messages.append(SystemMessage(content=msg["content"]))
             messages.append(HumanMessage(content=message))
             response = self.llm.invoke(messages)
-            # Ensure the response is always returned as a UTF-8 string
+            # Force UTF-8 encoding/decoding at every step
             if hasattr(response, 'content'):
-                if isinstance(response.content, bytes):
-                    return response.content.decode('utf-8', errors='replace')
-                else:
-                    return str(response.content)
-            elif isinstance(response, bytes):
-                return response.decode('utf-8', errors='replace')
+                content = response.content
             else:
-                return str(response)
+                content = response
+            if isinstance(content, bytes):
+                return content.decode('utf-8', errors='replace')
+            # If it's a string, re-encode and decode to force UTF-8
+            return str(content).encode('utf-8', errors='replace').decode('utf-8', errors='replace')
         except Exception as e:
             return f"I encountered an error: {str(e)}. Please try again with a different query."
     
