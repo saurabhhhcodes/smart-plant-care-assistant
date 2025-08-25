@@ -1,0 +1,43 @@
+import cv2
+import numpy as np
+from typing import Dict
+
+class PlantImageAnalyzer:
+    """Performs plant health and disease analysis using OpenCV."""
+
+    def analyze_plant_health(self, img: np.ndarray) -> Dict:
+        # Example: Simple color thresholding for green, yellow, brown
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        # Green mask
+        green_mask = cv2.inRange(hsv, (36, 25, 25), (86, 255,255))
+        # Yellow mask
+        yellow_mask = cv2.inRange(hsv, (15, 50, 50), (35, 255, 255))
+        # Brown mask (approximate)
+        brown_mask = cv2.inRange(hsv, (10, 100, 20), (20, 255, 200))
+        total = img.shape[0] * img.shape[1]
+        green_pct = 100 * np.sum(green_mask > 0) / total
+        yellow_pct = 100 * np.sum(yellow_mask > 0) / total
+        brown_pct = 100 * np.sum(brown_mask > 0) / total
+        healthy_pct = green_pct
+        return {
+            'healthy_percentage': healthy_pct,
+            'yellow_percentage': yellow_pct,
+            'brown_percentage': brown_pct
+        }
+
+    def detect_diseases(self, img: np.ndarray) -> Dict:
+        # Placeholder: No real disease detection, just a stub
+        return {
+            'powdery_mildew_percentage': 0.0,
+            'leaf_spot_percentage': 0.0,
+            'blight_percentage': 0.0
+        }
+
+    def analyze_video(self, video_path: str) -> Dict:
+        # Example: Analyze the first frame of a video
+        cap = cv2.VideoCapture(video_path)
+        ret, frame = cap.read()
+        cap.release()
+        if not ret:
+            return {'status': 'error', 'message': 'Could not read video.'}
+        return self.analyze_plant_health(frame)
