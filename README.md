@@ -1,103 +1,176 @@
 # 🌱 Smart Plant Care Assistant
 
-A full-stack web application that uses **computer vision** and **AI** to analyze plant health and provide personalized care recommendations. Built with React (frontend) and Python Flask (backend).
+A Streamlit-based application that helps you take care of your plants using AI-powered image analysis and chat assistance.
 
-## 🚀 Live Demo
+## Features
 
-**🌐 Live Application**: https://saurabhhhcodes.github.io/smart-plant-care-assistant
+- 📸 Upload plant images for health analysis
+- 💬 Chat with an AI plant care assistant
+- 🌿 Get personalized care recommendations
+- 🔍 Identify plant health issues
 
-## ✨ Features
+## Prerequisites
 
-### 📱 Frontend (React + TypeScript)
-- **Mobile-First Design**: Optimized for smartphones and tablets
-- **Camera Integration**: Real-time plant photo capture
-- **Photo Upload**: Upload existing plant images
-- **Responsive UI**: Beautiful, modern interface with Tailwind CSS
-- **Progressive Web App**: Installable on mobile devices
+- Python 3.8+
+- Ollama (for local AI processing)
+- Git (for version control)
 
-### 🔬 Backend (Python Flask)
-- **Computer Vision Analysis**: Real plant health detection using OpenCV
-- **Color Analysis**: Green, yellow, and brown color detection
-- **AI Recommendations**: Personalized care advice based on analysis
-- **RESTful API**: Easy integration and extensibility
-- **Plant Database**: Common plant care information
+## Installation
 
-### 🤖 AI-Powered Analysis
-- **Health Assessment**: Excellent/Good/Fair/Poor ratings
-- **Watering Analysis**: Needs water/Adequate/Excessive
-- **Light Assessment**: Sufficient/Insufficient/Excessive
-- **Issue Detection**: Automatic problem identification
-- **Confidence Scoring**: Analysis accuracy indicators
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/smart-plant-care-assistant.git
+   cd smart-plant-care-assistant
+   ```
+
+2. Install the required Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Install and set up Ollama:
+   - Download and install from [Ollama's website](https://ollama.ai/)
+   - Pull the required model (llama3 is recommended):
+     ```bash
+     ollama pull llama3
+     ```
+
+4. Create a `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+   Edit the `.env` file with your configuration if needed.
+
+## Usage
+
+1. Start the Ollama server (if not already running):
+   ```bash
+   ollama serve
+   ```
+
+2. In a new terminal, run the Streamlit app:
+   ```bash
+   streamlit run app.py
+   ```
+
+3. Open your browser and navigate to `http://localhost:8501`
+
+## Project Structure
+
+- `app.py` - Main Streamlit application
+- `full_plant_agent.py` - Core AI agent implementation
+- `plant_analysis.py` - Image analysis functionality
+- `requirements.txt` - Python dependencies
+- `.env.example` - Environment variables template
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+A powerful AI-powered application that uses **computer vision** and **large language models** to analyze plant health and provide personalized care recommendations. Built with Python and Streamlit for a seamless user experience.
+
+## 🚀 Features
+
+### 📷 Camera-First Analysis
+- **Real-time Camera Integration**: Analyze plants directly using your device's camera
+- **Automatic Analysis**: Set custom intervals for continuous monitoring
+- **Instant Feedback**: Get immediate health assessments and care recommendations
+
+### 🤖 AI-Powered Insights
+- **Plant Health Analysis**: Comprehensive health status with confidence scores
+- **Species Identification**: Automatic plant type detection
+- **Issue Detection**: Identify common plant problems
+- **Personalized Care Advice**: Get tailored recommendations for your plants
+- **Chat Interface**: Ask questions about plant care in natural language
+
+### 🛠️ Technical Features
+- **Local AI Processing**: Uses Ollama for privacy-focused local inference
+- **Computer Vision**: Advanced image analysis with OpenCV
+- **Streamlit UI**: Clean, responsive interface that works on any device
+- **Asynchronous Processing**: Smooth user experience with background analysis
 
 ## 🛠️ Technology Stack
 
-### Frontend
-- **React 18** with TypeScript
-- **Tailwind CSS** for styling
-- **Lucide React** for icons
-- **Canvas API** for image processing
-
-### Backend
-- **Python 3.8+** with Flask
+### Core Technologies
+- **Python 3.8+**
+- **Streamlit** for the web interface
+- **Ollama** for local LLM inference
 - **OpenCV** for computer vision
-- **NumPy** for numerical analysis
-- **Pillow** for image processing
-- **Flask-CORS** for cross-origin requests
+- **LangChain** for AI agent orchestration
+- **LangGraph** for workflow management
 
-## 📦 Installation
+### Key Dependencies
+- **Pillow** for image processing
+- **NumPy** for numerical operations
+- **python-dotenv** for environment management
+- **requests** for API calls
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+
-- Python 3.8+
-- npm or yarn
-- pip
+- Python 3.8 or higher
+- [Ollama](https://ollama.ai/) installed and running
+- Webcam (for camera analysis)
 
-### Frontend Setup
-```bash
-# Clone the repository
-git clone https://github.com/saurabhhhcodes/smart-plant-care-assistant.git
-cd smart-plant-care-assistant
+### Installation
 
-# Install dependencies
-npm install
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/saurabhhhcodes/smart-plant-care-assistant.git
+   cd smart-plant-care-assistant
+   ```
 
-# Start development server
-npm start
-```
+2. **Create and activate a virtual environment** (recommended)
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-### Backend Setup
-```bash
-# Navigate to backend directory
-cd backend
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# Install Python dependencies
-pip install -r requirements.txt
+4. **Download Ollama models**
+   ```bash
+   ollama pull llama3
+   ```
 
-# Start Flask server
-python app.py
-```
+5. **Run the application**
+   ```bash
+   streamlit run app.py
+   ```
 
-The backend API will be available at `http://localhost:5000`
+The application will be available at `http://localhost:8501`
 
 ## 🎯 Usage
 
-### Camera Analysis (Primary Method)
-1. Open the app on your mobile device
-2. Grant camera permissions when prompted
-3. Position your plant in the camera frame
-4. Tap "Capture & Analyze"
-5. Wait for AI analysis and recommendations
+### Camera Analysis (Recommended)
+1. Click the "Toggle Camera" button to start your camera
+2. Position your plant in the frame
+3. The app will automatically analyze the plant at regular intervals
+4. View real-time analysis results including health status and care recommendations
 
-### Photo Upload (Secondary Method)
-1. Switch to the "Upload" tab
-2. Select a photo from your gallery
-3. Wait for analysis and AI recommendations
+### Photo Upload (Alternative Method)
+1. Switch to the "Upload Photo" tab
+2. Click "Browse files" or drag and drop an image
+3. Click "Analyze Plant" to process the image
+4. View detailed analysis results
 
-### Understanding Results
-- **Health Status**: Overall plant condition
-- **Watering**: Current watering needs
-- **Light**: Light condition assessment
-- **Issues**: Detected problems or concerns
+### Chat with the Plant Expert
+1. Scroll down to the chat interface
+2. Ask any plant care questions in natural language
+3. Get AI-powered responses based on the latest plant analysis
+
+### Understanding the Analysis
+- **Health Status**: Overall plant health with confidence score
+- **Plant Type**: Identified species with confidence level
+- **Potential Issues**: Any detected problems
+- **Care Recommendations**: Personalized advice for your plant
 - **AI Advice**: Personalized care recommendations
 
 ## 🔧 API Endpoints
