@@ -10,7 +10,10 @@ import cv2
 # LangChain imports
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
-from langchain_together import TogetherLLM
+try:
+    from langchain_together import TogetherLLM
+except ImportError:
+    TogetherLLM = None  # Fallback for unsupported versions
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -48,11 +51,14 @@ class PlantCareAgent:
             )
         elif self.provider == "together":
             # For Meta models via Together.ai
-            return TogetherLLM(
-                model="meta-llama/Llama-3-70b-chat-hf",
-                together_api_key=self.api_key,
-                temperature=0.7
-            )
+            if TogetherLLM is not None:
+                return TogetherLLM(
+                    model="meta-llama/Llama-3-70b-chat-hf",
+                    together_api_key=self.api_key,
+                    temperature=0.7
+                )
+            else:
+                raise ImportError("TogetherLLM is not available in this version of langchain_together. Please update your requirements or code.")
         else:
             # Default to OpenAI if no provider specified
             return ChatOpenAI(

@@ -109,19 +109,33 @@ def display_upload_section():
         type=["jpg", "jpeg", "png"],
         key="file_uploader"
     )
-    
-    # Display uploaded image
-    if uploaded_file is not None:
+
+    # Camera input (Streamlit native)
+    camera_image = st.camera_input("Or take a photo with your camera")
+
+    # Prefer camera image if available
+    image_to_use = None
+    if camera_image is not None:
+        try:
+            image = Image.open(camera_image)
+            st.image(image, caption="Camera Plant Image", use_column_width=True)
+            st.session_state.uploaded_image = image
+            image_to_use = image
+        except Exception as e:
+            st.error(f"Error loading camera image: {str(e)}")
+            return
+    elif uploaded_file is not None:
         try:
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Plant Image", use_column_width=True)
             st.session_state.uploaded_image = image
+            image_to_use = image
         except Exception as e:
             st.error(f"Error loading image: {str(e)}")
             return
-    
+
     # Analysis button
-    if st.button("Analyze Plant", disabled=not st.session_state.agent_initialized or 'uploaded_image' not in st.session_state):
+    if st.button("Analyze Plant", disabled=not st.session_state.agent_initialized or image_to_use is None):
         analyze_plant_image()
 
 def analyze_plant_image():
