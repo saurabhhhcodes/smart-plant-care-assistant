@@ -141,7 +141,7 @@ def display_upload_section():
     elif camera_image is not None:
         try:
             image = Image.open(camera_image)
-            st.image(image, caption="Camera Plant Image", use_column_width=True)
+            st.image(image, caption="Camera Plant Image", use_container_width=True)
             st.session_state.uploaded_image = image
             image_to_use = image
         except Exception as e:
@@ -150,7 +150,7 @@ def display_upload_section():
     elif uploaded_file is not None:
         try:
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Plant Image", use_column_width=True)
+            st.image(image, caption="Uploaded Plant Image", use_container_width=True)
             st.session_state.uploaded_image = image
             image_to_use = image
         except Exception as e:
