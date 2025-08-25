@@ -9,16 +9,37 @@ import cv2
 
 # LangChain imports
 
+
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 try:
     from langchain_together import TogetherLLM
 except ImportError:
-    TogetherLLM = None  # Fallback for unsupported versions
+    TogetherLLM = None
 try:
     from langchain_community.llms import Ollama
 except ImportError:
     Ollama = None
+try:
+    from langchain_cohere import ChatCohere
+except ImportError:
+    ChatCohere = None
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except ImportError:
+    ChatGoogleGenerativeAI = None
+try:
+    from langchain_mistralai import ChatMistralAI
+except ImportError:
+    ChatMistralAI = None
+try:
+    from langchain_perplexity import ChatPerplexity
+except ImportError:
+    ChatPerplexity = None
+try:
+    from langchain_huggingface import HuggingFaceHub
+except ImportError:
+    HuggingFaceHub = None
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -55,7 +76,6 @@ class PlantCareAgent:
                 temperature=0.7
             )
         elif self.provider == "together":
-            # For Meta models via Together.ai
             if TogetherLLM is not None:
                 return TogetherLLM(
                     model="meta-llama/Llama-3-70b-chat-hf",
@@ -65,11 +85,54 @@ class PlantCareAgent:
             else:
                 raise ImportError("TogetherLLM is not available in this version of langchain_together. Please update your requirements or code.")
         elif self.provider == "ollama":
-            # Open source LLMs via Ollama (local or remote)
             if Ollama is not None:
-                return Ollama(model="llama2", temperature=0.7)  # You can change model name as needed
+                return Ollama(model="llama2", temperature=0.7)
             else:
                 raise ImportError("Ollama is not available. Please install langchain_community and run an Ollama server.")
+        elif self.provider == "cohere":
+            if ChatCohere is not None:
+                return ChatCohere(
+                    model="command-r-plus",
+                    cohere_api_key=self.api_key,
+                    temperature=0.7
+                )
+            else:
+                raise ImportError("ChatCohere is not available. Please install langchain_cohere.")
+        elif self.provider == "gemini":
+            if ChatGoogleGenerativeAI is not None:
+                return ChatGoogleGenerativeAI(
+                    model="gemini-pro",
+                    google_api_key=self.api_key,
+                    temperature=0.7
+                )
+            else:
+                raise ImportError("ChatGoogleGenerativeAI is not available. Please install langchain_google_genai.")
+        elif self.provider == "mistral":
+            if ChatMistralAI is not None:
+                return ChatMistralAI(
+                    model="mistral-medium",
+                    mistral_api_key=self.api_key,
+                    temperature=0.7
+                )
+            else:
+                raise ImportError("ChatMistralAI is not available. Please install langchain_mistralai.")
+        elif self.provider == "perplexity":
+            if ChatPerplexity is not None:
+                return ChatPerplexity(
+                    model="pplx-70b-online",
+                    perplexity_api_key=self.api_key,
+                    temperature=0.7
+                )
+            else:
+                raise ImportError("ChatPerplexity is not available. Please install langchain_perplexity.")
+        elif self.provider == "huggingface":
+            if HuggingFaceHub is not None:
+                return HuggingFaceHub(
+                    repo_id="HuggingFaceH4/zephyr-7b-beta",
+                    huggingfacehub_api_token=self.api_key
+                )
+            else:
+                raise ImportError("HuggingFaceHub is not available. Please install langchain_huggingface.")
         else:
             # Default to OpenAI if no provider specified
             return ChatOpenAI(
