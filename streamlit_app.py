@@ -103,19 +103,36 @@ def display_upload_section():
     """Display the image upload and analysis section."""
     st.header("🌿 Plant Analysis")
     
-    # File uploader
+    # File uploader for images
     uploaded_file = st.file_uploader(
         "Upload a photo of your plant",
         type=["jpg", "jpeg", "png"],
         key="file_uploader"
     )
 
+    # Video uploader
+    uploaded_video = st.file_uploader(
+        "Or upload a video of your plant (analyzes first frame)",
+        type=["mp4", "mov", "avi"],
+        key="video_uploader"
+    )
+
     # Camera input (Streamlit native)
     camera_image = st.camera_input("Or take a photo with your camera")
 
-    # Prefer camera image if available
+    # Prefer video > camera > image
     image_to_use = None
-    if camera_image is not None:
+    video_to_use = None
+    if uploaded_video is not None:
+        # Save video to a temp file
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_vid:
+            tmp_vid.write(uploaded_video.read())
+            video_path = tmp_vid.name
+        st.session_state.uploaded_video_path = video_path
+        st.video(video_path)
+        video_to_use = video_path
+    elif camera_image is not None:
         try:
             image = Image.open(camera_image)
             st.image(image, caption="Camera Plant Image", use_column_width=True)
@@ -135,8 +152,30 @@ def display_upload_section():
             return
 
     # Analysis button
-    if st.button("Analyze Plant", disabled=not st.session_state.agent_initialized or image_to_use is None):
-        analyze_plant_image()
+    if st.button("Analyze Plant", disabled=not st.session_state.agent_initialized or (image_to_use is None and video_to_use is None)):
+        if video_to_use is not None:
+            analyze_plant_video(video_to_use)
+        else:
+            analyze_plant_image()
+
+def analyze_plant_video(video_path):
+    """Analyze the first frame of the uploaded plant video."""
+    if not video_path:
+        st.warning("Please upload a video first")
+        return
+    with st.spinner("Analyzing your plant video..."):
+        try:
+            if st.session_state.agent_initialized and st.session_state.plant_agent:
+                analysis = st.session_state.plant_agent.analyzer.analyze_video(video_path)
+                if analysis.get('status') == 'error':
+                    st.error(analysis.get('message', 'Unknown error'))
+                else:
+                    st.success("Video analysis complete! 🎉 (First frame)")
+                    st.json(analysis)
+            else:
+                st.error("Plant Care Agent is not initialized")
+        except Exception as e:
+            st.error(f"Error during video analysis: {str(e)}")
 
 def analyze_plant_image():
     """Analyze the uploaded plant image."""
