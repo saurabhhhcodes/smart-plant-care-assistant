@@ -116,7 +116,8 @@ def display_sidebar():
 
         # Initialize button
         if st.button("Initialize Agent"):
-            if provider == "ollama" or api_key:
+            # For providers that do NOT require an API key
+            if provider in ["ollama", "local-hf"] or api_key:
                 try:
                     with st.spinner("Initializing Plant Care Agent..."):
                         st.session_state.plant_agent = PlantCareAgent(
@@ -137,7 +138,11 @@ def display_sidebar():
             st.success("✅ Plant Care Agent is ready")
         else:
             st.error("❌ Plant Care Agent not initialized")
-            st.info("Please enter your API key and click 'Initialize Agent'")
+            # Only show API key warning for providers that require it
+            if provider not in ["ollama", "local-hf"]:
+                st.info("Please enter your API key and click 'Initialize Agent'")
+            else:
+                st.info("Click 'Initialize Agent' to start using the open source LLM provider.")
 
         # App information
         st.subheader("About")
