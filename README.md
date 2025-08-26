@@ -104,6 +104,13 @@ Our plant analysis system provides confidence scores for all predictions:
 - **Nutrient Needs**: Fertilization recommendations
 - **Problem Solutions**: Specific solutions for detected issues
 
+
+## ⚠️ Note on Linux/Streamlit Cloud Warnings
+
+If you see a warning like `OSError: [Errno 28] inotify watch limit reached` in your logs, it is safe to ignore. This is a system-level file watcher limit and does **not** affect the app's functionality. Your plant care assistant will work as expected.
+
+---
+
 ## ☁️ Deployment
 
 This application is designed to work with Streamlit Cloud. Users can select their preferred LLM provider and enter their API key directly in the application interface.
