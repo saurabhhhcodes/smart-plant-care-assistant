@@ -93,6 +93,12 @@ def display_sidebar():
                 st.info("Ollama does not require an API key if running locally.")
             elif provider == "local-hf":
                 st.info("'local-hf' runs TinyLlama (open source) directly on your machine. No API key needed, but requires sufficient RAM and CPU/GPU.")
+                # Check for transformers/torch at runtime and show a user-friendly error if missing
+                try:
+                    import transformers, torch
+                except ImportError:
+                    st.error("❌ Required packages 'transformers' and 'torch' are not installed. Please install them with:\n\n    pip install transformers torch\n\nThen restart the app.")
+                    return
         else:
             provider_label = {
                 "openai": "OpenAI",
