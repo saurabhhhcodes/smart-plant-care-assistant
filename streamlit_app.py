@@ -72,22 +72,28 @@ def display_sidebar():
                 "perplexity",
                 "huggingface",
                 "ollama (open source LLMs)",
+                "local-hf (TinyLlama, open source, no API key)",
             ],
             index=0,
-            help="Select the LLM provider to use for analysis"
+            help="Select the LLM provider to use for analysis. 'local-hf' runs a small open source model (TinyLlama) directly on your machine, no API key required."
         )
         # Normalize provider value for backend
         if provider_display.startswith("ollama"):
             provider = "ollama"
+        elif provider_display.startswith("local-hf"):
+            provider = "local-hf"
         else:
             provider = provider_display
         st.session_state.provider = provider
 
-        # API key input (hide for Ollama)
-        if provider == "ollama":
-            st.subheader("API Key (not required for Ollama)")
+        # API key input (hide for Ollama and local-hf)
+        if provider in ["ollama", "local-hf"]:
+            st.subheader("API Key (not required)")
             api_key = ""
-            st.info("Ollama does not require an API key if running locally.")
+            if provider == "ollama":
+                st.info("Ollama does not require an API key if running locally.")
+            elif provider == "local-hf":
+                st.info("'local-hf' runs TinyLlama (open source) directly on your machine. No API key needed, but requires sufficient RAM and CPU/GPU.")
         else:
             provider_label = {
                 "openai": "OpenAI",

@@ -78,6 +78,17 @@ Our plant analysis system provides confidence scores for all predictions:
 - **Anthropic**: Claude models (Claude 3 Opus, Sonnet, Haiku)
 - **Meta**: Llama models through Together.ai (Llama 3, Llama 2)
 - **Other providers**: Additional models via Together.ai integration
+- **Ollama**: Run open source LLMs locally (no API key required, requires Ollama server)
+- **Hugging Face Hub**: Use models from Hugging Face with your API key
+- **local-hf (TinyLlama, open source, no API key)**: Runs a small, fast open source LLM (TinyLlama) directly on your machine using Hugging Face Transformers. No API key required. Great for privacy and offline use. Requires sufficient RAM and CPU/GPU. No server needed.
+
+---
+
+## 🌐 Try the App Online
+
+**[Smart Plant Care Assistant Streamlit App](https://smart-plant-care-langchain.streamlit.app/)**
+
+---
 
 ## 📊 Analysis Features
 

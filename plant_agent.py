@@ -1,3 +1,9 @@
+try:
+    from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
+except ImportError:
+    pipeline = None
+    AutoModelForCausalLM = None
+    AutoTokenizer = None
 import os
 from typing import Dict, List, Optional, Any
 import json
@@ -62,6 +68,31 @@ class PlantCareAgent:
         self.analyzer = PlantImageAnalyzer()
     
     def _initialize_llm(self):
+        # Local Hugging Face Transformers (no API key, open source, in-process)
+        if self.provider == "local-hf":
+            if pipeline is not None and AutoModelForCausalLM is not None and AutoTokenizer is not None:
+                # Use a small, fast open source model for best compatibility (TinyLlama)
+                model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+                try:
+                    pipe = pipeline(
+                        "text-generation",
+                        model=model_id,
+                        tokenizer=model_id,
+                        max_new_tokens=256,
+                        do_sample=True,
+                        temperature=0.7,
+                        trust_remote_code=True
+                    )
+                except Exception as e:
+                    raise RuntimeError(f"Failed to load local Hugging Face model: {e}\nTry increasing memory or using a smaller model.")
+                # Wrap the pipeline in a simple callable for compatibility
+                class LocalHFPipelineWrapper:
+                    def invoke(self, prompt):
+                        result = pipe(prompt, return_full_text=False)
+                        return type('Obj', (), {"content": result[0]["generated_text"] if result and isinstance(result, list) else str(result)})()
+                return LocalHFPipelineWrapper()
+            else:
+                raise ImportError("transformers or torch is not installed. Please install them to use local open source LLMs.")
         """Initialize the language model based on the provider."""
         if self.provider == "openai":
             return ChatOpenAI(
