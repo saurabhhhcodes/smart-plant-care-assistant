@@ -86,9 +86,8 @@ def display_sidebar():
             provider = provider_display
         st.session_state.provider = provider
 
-        # API key input (hide for Ollama and local-hf)
+        # API key input (completely hide for open source providers)
         if provider in ["ollama", "local-hf"]:
-            st.subheader("API Key (not required)")
             api_key = ""
             if provider == "ollama":
                 st.info("Ollama does not require an API key if running locally.")
@@ -114,10 +113,23 @@ def display_sidebar():
             )
         st.session_state.api_key = api_key
 
-        # Initialize button
-        if st.button("Initialize Agent"):
-            # For providers that do NOT require an API key
-            if provider in ["ollama", "local-hf"] or api_key:
+        # Auto-initialize for open source providers
+        if provider in ["ollama", "local-hf"] and not st.session_state.agent_initialized:
+            try:
+                with st.spinner("Initializing Plant Care Agent..."):
+                    st.session_state.plant_agent = PlantCareAgent(
+                        api_key=api_key,
+                        provider=provider
+                    )
+                    st.session_state.agent_initialized = True
+                    st.success("✅ Plant Care Agent initialized successfully!")
+            except Exception as e:
+                st.error(f"Error initializing Plant Care Agent: {str(e)}")
+                st.session_state.agent_initialized = False
+        # Manual initialize for API-key providers
+        elif provider not in ["ollama", "local-hf"]:
+            button_disabled = not bool(api_key)
+            if st.button("Initialize Agent", disabled=button_disabled):
                 try:
                     with st.spinner("Initializing Plant Care Agent..."):
                         st.session_state.plant_agent = PlantCareAgent(
@@ -129,8 +141,6 @@ def display_sidebar():
                 except Exception as e:
                     st.error(f"Error initializing Plant Care Agent: {str(e)}")
                     st.session_state.agent_initialized = False
-            else:
-                st.warning("Please enter your API key")
 
         # Status indicators
         st.subheader("Status")
