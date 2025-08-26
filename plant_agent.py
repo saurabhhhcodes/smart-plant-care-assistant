@@ -86,6 +86,18 @@ class PlantCareAgent:
                 raise ImportError("TogetherLLM is not available in this version of langchain_together. Please update your requirements or code.")
         elif self.provider == "ollama":
             if Ollama is not None:
+                # Check if Ollama server is running
+                import requests
+                try:
+                    resp = requests.get("http://localhost:11434")
+                    if resp.status_code != 200:
+                        raise Exception()
+                except Exception:
+                    raise RuntimeError(
+                        "Ollama server is not running on localhost:11434. "
+                        "Please start Ollama with 'ollama serve' on your local machine. "
+                        "Ollama is not supported on most cloud platforms."
+                    )
                 return Ollama(model="llama3", temperature=0.7)  # Llama 3 is latest in Ollama
             else:
                 raise ImportError("Ollama is not available. Please install langchain_community and run an Ollama server.")
