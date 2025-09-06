@@ -278,6 +278,12 @@ def display_analysis_results(analysis):
     try:
         if analysis.get('status') == 'success':
             st.success("Analysis complete! 🎉")
+            
+            # Display species
+            if 'species' in analysis:
+                st.subheader("🌿 Plant Species")
+                st.write(analysis['species'])
+
             # Display health metrics
             health = analysis.get('health_analysis', {})
             st.subheader("🌱 Plant Health Summary")

@@ -215,6 +215,16 @@ class PlantCareAgent:
                     'message': 'Failed to decode image. Please try again with a different image.'
                 }
             
+            # Detect if a plant is present
+            if not self.analyzer.detect_plant(img):
+                return {
+                    'status': 'error',
+                    'message': 'No plant detected in the image. Please upload a clear photo of a plant.'
+                }
+
+            # Identify plant species
+            species = self._identify_plant_species(image_data)
+
             # Analyze the image
             health_analysis = self.analyzer.analyze_plant_health(img)
             disease_analysis = self.analyzer.detect_diseases(img)
@@ -223,7 +233,7 @@ class PlantCareAgent:
             summary = self._generate_analysis_summary(health_analysis, disease_analysis)
             
             # Generate care recommendations using LLM
-            recommendations = self._generate_care_recommendations(health_analysis, disease_analysis)
+            recommendations = self._generate_care_recommendations(health_analysis, disease_analysis, species)
             
             return {
                 'status': 'success',
@@ -231,6 +241,7 @@ class PlantCareAgent:
                 'disease_analysis': disease_analysis,
                 'summary': summary,
                 'recommendations': recommendations,
+                'species': species,
                 'message': 'Image analyzed successfully.'
             }
         except Exception as e:
@@ -286,19 +297,41 @@ class PlantCareAgent:
         
         return summary
     
-    def _generate_care_recommendations(self, health_analysis: Dict, disease_analysis: Dict) -> List[str]:
+    def _identify_plant_species(self, image_data: str) -> str:
+        """Identify the plant species using the LLM."""
+        try:
+            # Create a prompt for the LLM
+            prompt = "Identify the plant species in this image. Provide the common and scientific name."
+            
+            # Get response from the LLM
+            response = self.llm.invoke(
+                [
+                    HumanMessage(
+                        content=[
+                            {"type": "text", "text": prompt},
+                            {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_data}"}
+                        ]
+                    )
+                ]
+            )
+            return response.content.strip()
+        except Exception:
+            return "Could not identify plant species."
+
+    def _generate_care_recommendations(self, health_analysis: Dict, disease_analysis: Dict, species: str) -> List[str]:
         """Generate care recommendations using the LLM.
         
         Args:
             health_analysis: Dictionary containing health metrics
             disease_analysis: Dictionary containing disease metrics
+            species: The identified plant species
             
         Returns:
             List of care recommendations
         """
         # Create a prompt for the LLM
         prompt = f"""
-        Based on the following plant health analysis, provide 3-5 specific care recommendations:
+        Based on the following health analysis for a {species} plant, provide 3-5 specific care recommendations:
         
         Health Analysis:
         - Healthy percentage: {health_analysis.get('healthy_percentage', 0):.1f}%
@@ -367,25 +400,25 @@ class PlantCareAgent:
         try:
             messages = []
             messages.append(SystemMessage(content="""
-            You are a helpful plant care assistant. Your goal is to help users take care of their plants 
-            by providing accurate and helpful information about plant care, diagnosing issues, and offering recommendations.
-            When users ask about plant care, consider:
-            - Watering needs (frequency, amount, technique)
-            - Light requirements (direct, indirect, low, high)
-            - Soil and drainage preferences
-            - Fertilization schedules
-            - Common problems and solutions
-            - Seasonal care adjustments
-            - Pest identification and treatment
-            - Disease prevention and treatment
-            Always provide specific, actionable advice based on the plant type if mentioned.
+            You are a friendly and knowledgeable plant care assistant. Your name is Flora.
+            Your goal is to help users with all their plant-related questions in a warm and encouraging tone.
+            When responding, consider the user's potential emotional connection to their plants.
+            Provide clear, actionable advice, and always be positive and supportive.
+            If you don't know the answer, it's okay to say so, but offer to find out or suggest where the user can look for more information.
+            
+            Key areas of expertise:
+            - Plant identification and fun facts.
+            - Detailed care instructions (watering, light, soil, fertilizer).
+            - Diagnosing and treating pests and diseases.
+            - Pruning and propagation techniques.
+            - General tips for happy, healthy plants.
             """))
             if chat_history:
                 for msg in chat_history:
                     if msg["role"] == "user":
                         messages.append(HumanMessage(content=msg["content"]))
-                    else:
-                        messages.append(SystemMessage(content=msg["content"]))
+                    elif msg["role"] == "assistant":
+                        messages.append(SystemMessage(content=msg["content"])) # Use SystemMessage for assistant
             messages.append(HumanMessage(content=message))
             response = self.llm.invoke(messages)
             # Force UTF-8 encoding/decoding at every step

@@ -5,6 +5,16 @@ from typing import Dict
 class PlantImageAnalyzer:
     """Performs plant health and disease analysis using OpenCV."""
 
+    def detect_plant(self, img: np.ndarray) -> bool:
+        """Detect if a plant is present in the image."""
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        # Green mask to identify plant-like colors
+        green_mask = cv2.inRange(hsv, (36, 25, 25), (86, 255, 255))
+        # Calculate the percentage of green pixels
+        green_percentage = (cv2.countNonZero(green_mask) / (img.shape[0] * img.shape[1])) * 100
+        # If green percentage is above a threshold, assume a plant is present
+        return green_percentage > 5  # Threshold of 5% green pixels
+
     def analyze_plant_health(self, img: np.ndarray) -> Dict:
         # Example: Simple color thresholding for green, yellow, brown
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
