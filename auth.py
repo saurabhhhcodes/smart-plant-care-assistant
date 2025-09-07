@@ -8,9 +8,7 @@ def initialize_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
-            email TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            subscription_level TEXT NOT NULL DEFAULT 'Free'
+            password TEXT NOT NULL
         )
     ''')
     conn.commit()
@@ -19,11 +17,11 @@ def initialize_db():
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def register_user(username, email, password):
+def register_user(username, password):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO users (username, email, password, subscription_level) VALUES (?, ?, ?, ?)", (username, email, hash_password(password), 'Free'))
+        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hash_password(password)))
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -31,10 +29,10 @@ def register_user(username, email, password):
     finally:
         conn.close()
 
-def login_user(username_or_email, password):
+def login_user(username, password):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute("SELECT password FROM users WHERE username = ? OR email = ?", (username_or_email, username_or_email))
+    c.execute("SELECT password FROM users WHERE username = ?", (username,))
     stored_password = c.fetchone()
     conn.close()
     if stored_password and stored_password[0] == hash_password(password):

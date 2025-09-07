@@ -10,7 +10,6 @@ import numpy as np
 import base64
 from datetime import datetime
 from dotenv import load_dotenv
-import sqlite3
 
 # Add the current directory to the Python path FIRST
 sys.path.append(str(Path(__file__).parent))
@@ -50,13 +49,6 @@ try:
 except ImportError as e:
     st.error(f"Failed to import PACKAGES: {e}")
     st.error("Please make sure packages.py exists and is in the same directory.")
-    st.stop()
-
-try:
-    from email_agent import send_welcome_email, send_advertisement_email
-except ImportError as e:
-    st.error(f"Failed to import email functions: {e}")
-    st.error("Please make sure email_agent.py exists and is in the same directory.")
     st.stop()
 
 def initialize_session_state():
@@ -261,7 +253,7 @@ def display_upload_section():
 
     # Analysis button
     analysis_disabled = not st.session_state.agent_initialized or (image_to_use is None and video_to_use is None)
-    if st.session_state.subscription_level == "Free" and st.session_state.gemini_search_count >= 20:
+    if st.session_state.gemini_search_count >= 20:
         analysis_disabled = True
         st.warning("You have reached your free trial limit. Please upgrade to a premium plan to continue using the analysis feature.")
 
@@ -411,13 +403,6 @@ def display_chat_interface():
                     st.error(error_msg)
                     st.session_state.messages.append({"role": "assistant", "content": error_msg})
 
-def update_subscription_level(username, subscription_level):
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-    c.execute("UPDATE users SET subscription_level = ? WHERE username = ?", (subscription_level, username))
-    conn.commit()
-    conn.close()
-
 def main():
     # Set page config
     st.set_page_config(
@@ -443,8 +428,7 @@ def main():
         st.title("🌱 Smart Plant Care Assistant")
         st.markdown("### 🌿 AI-Powered Plant Health Analysis with Real LLMs")
         
-        if st.session_state.subscription_level == "Free":
-            st.info("🎉 You have 20 free trials with Gemini! Select Gemini from the sidebar to get started.")
+        st.info("🎉 You have 20 free trials with Gemini! Select Gemini from the sidebar to get started.")
 
         # Create tabs for different features
         tab1, tab2, tab3 = st.tabs(["📸 Analyze Plant", "💬 Chat with Expert", "📦 Packages"])
@@ -463,7 +447,7 @@ def display_login_page():
     
     choice = st.selectbox("Choose an action", ["Login", "Register"])
     
-    username = st.text_input("Username or Email")
+    username = st.text_input("Username")
     if choice == "Register":
         email = st.text_input("Email")
     password = st.text_input("Password", type="password")
@@ -480,12 +464,6 @@ def display_login_page():
             if login_user(username, password):
                 st.session_state.logged_in = True
                 st.session_state.username = username
-                # Get subscription level from database
-                conn = sqlite3.connect('users.db')
-                c = conn.cursor()
-                c.execute("SELECT subscription_level FROM users WHERE username = ? OR email = ?", (username, username))
-                st.session_state.subscription_level = c.fetchone()[0]
-                conn.close()
                 st.rerun()
             else:
                 st.error("Invalid username or password.")
@@ -499,10 +477,7 @@ def display_packages():
             st.metric("Price", package["price"])
             for feature in package["features"]:
                 st.markdown(f"- {feature}")
-            if st.button("Subscribe", key=package["name"]):
-                update_subscription_level(st.session_state.username, package["name"])
-                st.success(f"You have successfully subscribed to the {package['name']} package!")
-                st.rerun()
+            st.link_button("Subscribe", package["payment_link"])
 
 if __name__ == "__main__":
     main()
