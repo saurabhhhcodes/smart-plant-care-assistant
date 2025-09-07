@@ -7,6 +7,9 @@ class PlantImageAnalyzer:
 
     def _enhance_image(self, img: np.ndarray) -> np.ndarray:
         """Applies an advanced image enhancement pipeline."""
+        # Resize image for faster processing
+        img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_AREA)
+
         # 1. Auto-Brightness and Contrast using CLAHE
         lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
         l, a, b = cv2.split(lab)
