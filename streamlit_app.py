@@ -130,9 +130,24 @@ def display_sidebar():
             }.get(provider, provider.title())
             st.subheader(f"API Key for {provider_label}")
             if provider == "gemini":
-                st.info("You have 20 free Gemini searches.")
+                st.info("You have 20 free Gemini searches with the trial key.")
                 st.metric("Remaining Searches", 20 - st.session_state.gemini_search_count)
-                api_key = os.getenv("GEMINI_API_KEY")
+                
+                gemini_key_option = st.radio(
+                    "Choose Gemini API Key Option",
+                    ("Use Trial Key (20 Searches)", "Use My Own API Key"),
+                    index=0
+                )
+                
+                if gemini_key_option == "Use My Own API Key":
+                    api_key = st.text_input(
+                        "Enter your Google Gemini API key",
+                        type="password",
+                        help="Enter your Google Gemini API key",
+                        value=st.session_state.api_key
+                    )
+                else:
+                    api_key = os.getenv("GEMINI_API_KEY")
             else:
                 api_key = st.text_input(
                     f"Enter your {provider_label} API key",
@@ -143,7 +158,9 @@ def display_sidebar():
         st.session_state.api_key = api_key
 
         # Auto-initialize for open source providers
-        if provider in ["ollama", "local-hf", "gemini"] and not st.session_state.agent_initialized:
+        # Combined initialization logic
+        button_disabled = not bool(api_key) and provider not in ["ollama", "local-hf"]
+        if st.button("Initialize Agent", disabled=button_disabled):
             try:
                 with st.spinner("Initializing Plant Care Agent..."):
                     st.session_state.plant_agent = PlantCareAgent(
@@ -155,21 +172,6 @@ def display_sidebar():
             except Exception as e:
                 st.error(f"Error initializing Plant Care Agent: {str(e)}")
                 st.session_state.agent_initialized = False
-        # Manual initialize for API-key providers
-        elif provider not in ["ollama", "local-hf", "gemini"]:
-            button_disabled = not bool(api_key)
-            if st.button("Initialize Agent", disabled=button_disabled):
-                try:
-                    with st.spinner("Initializing Plant Care Agent..."):
-                        st.session_state.plant_agent = PlantCareAgent(
-                            api_key=api_key,
-                            provider=provider
-                        )
-                        st.session_state.agent_initialized = True
-                        st.success("✅ Plant Care Agent initialized successfully!")
-                except Exception as e:
-                    st.error(f"Error initializing Plant Care Agent: {str(e)}")
-                    st.session_state.agent_initialized = False
 
         # Status indicators
         st.subheader("Status")
@@ -178,10 +180,7 @@ def display_sidebar():
         else:
             st.error("❌ Plant Care Agent not initialized")
             # Only show API key warning for providers that require it
-            if provider not in ["ollama", "local-hf", "gemini"]:
-                st.info("Please enter your API key and click 'Initialize Agent'")
-            else:
-                st.info("Ollama is initializing. If this is the first time, it may take a moment to download the model.")
+            st.info("Please enter your API key and click 'Initialize Agent'")
 
         # App information
         st.subheader("About")
@@ -455,7 +454,8 @@ def display_login_page():
     if choice == "Register":
         if st.button("Register"):
             if register_user(username, email, password):
-                send_welcome_email(email)
+                from email_agent import send_welcome_email
+                send_welcome_email(email, username)
                 st.success("Registration successful! Please login.")
             else:
                 st.error("Username or email already exists.")

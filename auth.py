@@ -8,6 +8,7 @@ def initialize_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
         )
     ''')
@@ -17,11 +18,11 @@ def initialize_db():
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def register_user(username, password):
+def register_user(username, email, password):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hash_password(password)))
+        c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, hash_password(password)))
         conn.commit()
         return True
     except sqlite3.IntegrityError:

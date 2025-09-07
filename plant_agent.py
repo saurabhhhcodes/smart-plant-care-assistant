@@ -286,7 +286,7 @@ class PlantCareAgent:
         disease_warnings = []
         
         for disease, percentage in disease_analysis.items():
-            if percentage > 10:  # Threshold for considering it significant
+            if isinstance(percentage, (int, float)) and percentage > 10:
                 disease_detected = True
                 disease_name = disease.replace('_', ' ').title()
                 disease_warnings.append(f"{disease_name}: {percentage:.1f}%")

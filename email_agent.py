@@ -34,11 +34,11 @@ def send_email(to_address, subject, body):
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def send_welcome_email(email):
+def send_welcome_email(email, username):
     """Sends a welcome email to a new user."""
     subject = "Welcome to the Smart Plant Care Assistant!"
-    body = """
-    Hi there,
+    body = f"""
+    Hi {username},
 
     Thank you for registering for the Smart Plant Care Assistant! We're excited to have you.
 
