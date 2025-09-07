@@ -10,6 +10,10 @@ A Streamlit-based application that helps you take care of your plants using AI-p
 - 🔍 **Identify plant health issues** with detailed diagnostics
 - 🌐 **Supports multiple LLM providers** (OpenAI, Anthropic, Meta, etc.)
 - 📱 **Mobile-friendly interface** for on-the-go plant care
+- 📧 **Email notifications** for registration and subscriptions
+- 💳 **Subscription packages** with one-tap payments
+- 👥 **User authentication** with username/email and password
+- ✨ **20 free trials** with Gemini for new users
 
 ## 🎯 Evaluation & Prediction Confidences
 
@@ -53,7 +57,7 @@ Our plant analysis system provides confidence scores for all predictions:
    pip install -r requirements.txt
    ```
 
-3. Set up your API keys in a `.env` file. You can use the `.env.example` file as a template.
+3. Set up your API keys and email credentials in a `.env` file. You can use the `.env.example` file as a template.
 
 ## 🎯 Usage
 
@@ -64,13 +68,15 @@ Our plant analysis system provides confidence scores for all predictions:
 
 2. Open your browser and navigate to `http://localhost:8501`
 
-3. Select your preferred LLM provider and enter your API key in the sidebar
+3. Register a new account or log in with your existing credentials
 
-4. Upload a photo of your plant or use the camera feature
+4. Select your preferred LLM provider and enter your API key in the sidebar
 
-5. View analysis results with confidence scores
+5. Upload a photo of your plant or use the camera feature
 
-6. Chat with the AI assistant for personalized care advice
+6. View analysis results with confidence scores
+
+7. Chat with the AI assistant for personalized care advice
 
 ## 🤖 Supported LLM Providers
 
