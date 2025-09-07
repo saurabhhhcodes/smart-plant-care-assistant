@@ -151,7 +151,7 @@ def display_sidebar():
         st.session_state.api_key = api_key
 
         # Auto-initialize for open source providers
-        if provider in ["ollama", "local-hf"] and not st.session_state.agent_initialized:
+        if provider in ["ollama", "local-hf", "gemini"] and not st.session_state.agent_initialized:
             try:
                 with st.spinner("Initializing Plant Care Agent..."):
                     st.session_state.plant_agent = PlantCareAgent(
@@ -164,7 +164,7 @@ def display_sidebar():
                 st.error(f"Error initializing Plant Care Agent: {str(e)}")
                 st.session_state.agent_initialized = False
         # Manual initialize for API-key providers
-        elif provider not in ["ollama", "local-hf"]:
+        elif provider not in ["ollama", "local-hf", "gemini"]:
             button_disabled = not bool(api_key)
             if st.button("Initialize Agent", disabled=button_disabled):
                 try:
@@ -186,7 +186,7 @@ def display_sidebar():
         else:
             st.error("❌ Plant Care Agent not initialized")
             # Only show API key warning for providers that require it
-            if provider not in ["ollama", "local-hf"]:
+            if provider not in ["ollama", "local-hf", "gemini"]:
                 st.info("Please enter your API key and click 'Initialize Agent'")
             else:
                 st.info("Ollama is initializing. If this is the first time, it may take a moment to download the model.")
