@@ -47,6 +47,7 @@ try:
 except ImportError:
     HuggingFaceHub = None
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage, SystemMessage
 
 # Local imports
@@ -129,7 +130,11 @@ class PlantCareAgent:
                         "Please start Ollama with 'ollama serve' on your local machine. "
                         "Ollama is not supported on most cloud platforms."
                     )
-                return Ollama(model="llama3", temperature=0.7)  # Llama 3 is latest in Ollama
+                # Use a vision model for image analysis, default to a chat model otherwise
+                # This allows the app to handle both image and text-based queries with Ollama
+                if hasattr(self, '_is_vision_request') and self._is_vision_request:
+                    return Ollama(model="llava", temperature=0.7)  # LLaVA is a vision model
+                return Ollama(model="llama3", temperature=0.7)
             else:
                 raise ImportError("Ollama is not available. Please install langchain_community and run an Ollama server.")
         elif self.provider == "cohere":
@@ -300,6 +305,9 @@ class PlantCareAgent:
     def _identify_plant_species(self, image_data: str) -> str:
         """Identify the plant species using the LLM."""
         try:
+            # Set a flag to indicate a vision model is needed
+            self._is_vision_request = True
+            self.llm = self._initialize_llm()  # Re-initialize LLM to select a vision model if needed
             # Create a prompt for the LLM
             prompt = "Identify the plant species in this image. Provide the common and scientific name."
             
@@ -317,6 +325,10 @@ class PlantCareAgent:
             return response.content.strip()
         except Exception:
             return "Could not identify plant species."
+        finally:
+            # Reset the flag and re-initialize to the default model
+            self._is_vision_request = False
+            self.llm = self._initialize_llm()
 
     def _generate_care_recommendations(self, health_analysis: Dict, disease_analysis: Dict, species: str) -> List[str]:
         """Generate care recommendations using the LLM.
@@ -418,7 +430,7 @@ class PlantCareAgent:
                     if msg["role"] == "user":
                         messages.append(HumanMessage(content=msg["content"]))
                     elif msg["role"] == "assistant":
-                        messages.append(SystemMessage(content=msg["content"])) # Use SystemMessage for assistant
+                        messages.append(AIMessage(content=msg["content"])) # Use AIMessage for assistant
             messages.append(HumanMessage(content=message))
             response = self.llm.invoke(messages)
             # Force UTF-8 encoding/decoding at every step

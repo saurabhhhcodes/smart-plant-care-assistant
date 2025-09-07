@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import sys
 import io
@@ -11,7 +9,10 @@ import cv2
 import numpy as np
 import base64
 from datetime import datetime
+from dotenv import load_dotenv
+import sqlite3
 
+load_dotenv()
 # Ensure UTF-8 encoding for all output (fixes emoji errors)
 try:
     if sys.getdefaultencoding().lower() != 'utf-8':
@@ -37,6 +38,27 @@ except ImportError as e:
     st.error("Please make sure all dependencies are installed and the file exists.")
     st.stop()
 
+try:
+    from auth import initialize_db, register_user, login_user
+except ImportError as e:
+    st.error(f"Failed to import auth functions: {e}")
+    st.error("Please make sure auth.py exists and is in the same directory.")
+    st.stop()
+
+try:
+    from packages import PACKAGES
+except ImportError as e:
+    st.error(f"Failed to import PACKAGES: {e}")
+    st.error("Please make sure packages.py exists and is in the same directory.")
+    st.stop()
+
+try:
+    from email_agent import send_welcome_email, send_advertisement_email
+except ImportError as e:
+    st.error(f"Failed to import email functions: {e}")
+    st.error("Please make sure email_agent.py exists and is in the same directory.")
+    st.stop()
+
 def initialize_session_state():
     """Initialize session state variables."""
     if 'plant_agent' not in st.session_state:
@@ -53,6 +75,10 @@ def initialize_session_state():
         st.session_state.messages = [
             {"role": "assistant", "content": "Hello! I'm your Plant Care Assistant. How can I help you with your plants today?"}
         ]
+    if 'gemini_search_count' not in st.session_state:
+        st.session_state.gemini_search_count = 0
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
 
 def display_sidebar():
     """Display the sidebar with LLM provider selection and API key input."""
@@ -73,10 +99,10 @@ def display_sidebar():
                 "huggingface",
                 "ollama (open source LLMs)",
                 "local-hf (TinyLlama, open source, no API key)",
-            ],
-            index=0,
-            help="Select the LLM provider to use for analysis. 'local-hf' runs a small open source model (TinyLlama) directly on your machine, no API key required."
-        )
+           ],
+           index=4,  # Set Gemini as the default
+           help="Select the LLM provider to use for analysis. 'local-hf' runs a small open source model (TinyLlama) directly on your machine, no API key required."
+       )
         # Normalize provider value for backend
         if provider_display.startswith("ollama"):
             provider = "ollama"
@@ -111,12 +137,17 @@ def display_sidebar():
                 "huggingface": "Hugging Face Hub",
             }.get(provider, provider.title())
             st.subheader(f"API Key for {provider_label}")
-            api_key = st.text_input(
-                f"Enter your {provider_label} API key",
-                type="password",
-                help=f"Enter your {provider_label} API key",
-                value=st.session_state.api_key
-            )
+            if provider == "gemini":
+                st.info("You have 20 free Gemini searches.")
+                st.metric("Remaining Searches", 20 - st.session_state.gemini_search_count)
+                api_key = os.getenv("GEMINI_API_KEY")
+            else:
+                api_key = st.text_input(
+                    f"Enter your {provider_label} API key",
+                    type="password",
+                    help=f"Enter your {provider_label} API key",
+                    value=st.session_state.api_key
+                )
         st.session_state.api_key = api_key
 
         # Auto-initialize for open source providers
@@ -158,7 +189,7 @@ def display_sidebar():
             if provider not in ["ollama", "local-hf"]:
                 st.info("Please enter your API key and click 'Initialize Agent'")
             else:
-                st.info("Click 'Initialize Agent' to start using the open source LLM provider.")
+                st.info("Ollama is initializing. If this is the first time, it may take a moment to download the model.")
 
         # App information
         st.subheader("About")
@@ -171,6 +202,10 @@ def display_sidebar():
         - 🌿 Get personalized care tips
         - 🔍 Identify plant health issues
         """)
+        if st.session_state.logged_in:
+            if st.button("Logout"):
+                st.session_state.logged_in = False
+                st.rerun()
 
 def display_upload_section():
     """Display the image upload and analysis section."""
@@ -225,7 +260,14 @@ def display_upload_section():
             return
 
     # Analysis button
-    if st.button("Analyze Plant", disabled=not st.session_state.agent_initialized or (image_to_use is None and video_to_use is None)):
+    analysis_disabled = not st.session_state.agent_initialized or (image_to_use is None and video_to_use is None)
+    if st.session_state.subscription_level == "Free" and st.session_state.gemini_search_count >= 20:
+        analysis_disabled = True
+        st.warning("You have reached your free trial limit. Please upgrade to a premium plan to continue using the analysis feature.")
+
+    if st.button("Analyze Plant", disabled=analysis_disabled):
+        if st.session_state.provider == "gemini":
+            st.session_state.gemini_search_count += 1
         if video_to_use is not None:
             analyze_plant_video(video_to_use)
         else:
@@ -328,7 +370,8 @@ def display_chat_interface():
                 st.markdown(f"[Unicode error displaying message: {e}]")
 
     # Chat input
-    prompt = st.chat_input("Ask me anything about plant care...", disabled=not st.session_state.agent_initialized)
+    chat_disabled = not st.session_state.agent_initialized
+    prompt = st.chat_input("Ask me anything about plant care...", disabled=chat_disabled)
     if prompt is not None:
         try:
             # Force UTF-8 for input
@@ -368,6 +411,13 @@ def display_chat_interface():
                     st.error(error_msg)
                     st.session_state.messages.append({"role": "assistant", "content": error_msg})
 
+def update_subscription_level(username, subscription_level):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute("UPDATE users SET subscription_level = ? WHERE username = ?", (subscription_level, username))
+    conn.commit()
+    conn.close()
+
 def main():
     # Set page config
     st.set_page_config(
@@ -377,24 +427,82 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Initialize session state
+    with open("style.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
     initialize_session_state()
+    initialize_db()
+
+    if not st.session_state.logged_in:
+        display_login_page()
+    else:
+        # Display sidebar
+        display_sidebar()
+        
+        # Main content
+        st.title("🌱 Smart Plant Care Assistant")
+        st.markdown("### 🌿 AI-Powered Plant Health Analysis with Real LLMs")
+        
+        if st.session_state.subscription_level == "Free":
+            st.info("🎉 You have 20 free trials with Gemini! Select Gemini from the sidebar to get started.")
+
+        # Create tabs for different features
+        tab1, tab2, tab3 = st.tabs(["📸 Analyze Plant", "💬 Chat with Expert", "📦 Packages"])
+        
+        with tab1:
+            display_upload_section()
+        
+        with tab2:
+            display_chat_interface()
+
+        with tab3:
+            display_packages()
+
+def display_login_page():
+    st.title("Login / Register")
     
-    # Display sidebar
-    display_sidebar()
+    choice = st.selectbox("Choose an action", ["Login", "Register"])
     
-    # Main content
-    st.title("🌱 Smart Plant Care Assistant")
-    st.markdown("### 🌿 AI-Powered Plant Health Analysis with Real LLMs")
+    username = st.text_input("Username or Email")
+    if choice == "Register":
+        email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
     
-    # Create tabs for different features
-    tab1, tab2 = st.tabs(["📸 Analyze Plant", "💬 Chat with Expert"])
+    if choice == "Register":
+        if st.button("Register"):
+            if register_user(username, email, password):
+                send_welcome_email(email)
+                st.success("Registration successful! Please login.")
+            else:
+                st.error("Username or email already exists.")
+    else:
+        if st.button("Login"):
+            if login_user(username, password):
+                st.session_state.logged_in = True
+                st.session_state.username = username
+                # Get subscription level from database
+                conn = sqlite3.connect('users.db')
+                c = conn.cursor()
+                c.execute("SELECT subscription_level FROM users WHERE username = ? OR email = ?", (username, username))
+                st.session_state.subscription_level = c.fetchone()[0]
+                conn.close()
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
+
+def display_packages():
+    st.header("Subscription Packages")
     
-    with tab1:
-        display_upload_section()
-    
-    with tab2:
-        display_chat_interface()
+    for package in PACKAGES:
+        with st.container():
+            st.subheader(package["name"])
+            st.metric("Price", package["price"])
+            for feature in package["features"]:
+                st.markdown(f"- {feature}")
+            if st.button("Subscribe", key=package["name"]):
+                update_subscription_level(st.session_state.username, package["name"])
+                st.success(f"You have successfully subscribed to the {package['name']} package!")
+                st.rerun()
 
 if __name__ == "__main__":
     main()

@@ -53,7 +53,7 @@ Our plant analysis system provides confidence scores for all predictions:
    pip install -r requirements.txt
    ```
 
-3. Set up your API keys in the application (no need to set environment variables)
+3. Set up your API keys in a `.env` file. You can use the `.env.example` file as a template.
 
 ## 🎯 Usage
 
