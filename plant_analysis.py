@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
 from typing import Dict
+from functools import lru_cache
 
 class PlantImageAnalyzer:
     """Performs plant health and disease analysis using OpenCV."""
 
+    @lru_cache(maxsize=32)
     def _enhance_image(self, img: np.ndarray) -> np.ndarray:
         """Applies an advanced image enhancement pipeline."""
         # Resize image for faster processing

@@ -148,11 +148,13 @@ class PlantCareAgent:
                 raise ImportError("ChatCohere is not available. Please install langchain_cohere.")
         elif self.provider == "gemini":
             if ChatGoogleGenerativeAI is not None:
-                return ChatGoogleGenerativeAI(
-                    model="models/gemini-1.5-pro-latest",  # latest Gemini model as of 2025
-                    google_api_key=self.api_key,
-                    temperature=0.7
-                )
+               return ChatGoogleGenerativeAI(
+                   model="models/gemini-1.5-pro-latest",  # latest Gemini model as of 2025
+                   google_api_key=self.api_key,
+                   temperature=0.7,
+                   client_options={"api_endpoint": "generativelanguage.googleapis.com"},
+                   transport="rest",
+               )
             else:
                 raise ImportError("ChatGoogleGenerativeAI is not available. Please install langchain_google_genai.")
         elif self.provider == "mistral":
