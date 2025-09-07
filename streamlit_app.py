@@ -12,6 +12,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 import sqlite3
 
+# Add the current directory to the Python path FIRST
+sys.path.append(str(Path(__file__).parent))
+
 load_dotenv()
 # Ensure UTF-8 encoding for all output (fixes emoji errors)
 try:
@@ -26,9 +29,6 @@ try:
     os.environ['PYTHONIOENCODING'] = 'utf-8'
 except Exception as e:
     st.warning(f"Could not set UTF-8 encoding: {e}")
-
-# Add the current directory to the Python path
-sys.path.append(str(Path(__file__).parent))
 
 # Import the plant agent
 try:
