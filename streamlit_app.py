@@ -99,10 +99,10 @@ def display_sidebar():
                 "huggingface",
                 "ollama (open source LLMs)",
                 "local-hf (TinyLlama, open source, no API key)",
-           ],
-           index=4,  # Set Gemini as the default
-           help="Select the LLM provider to use for analysis. 'local-hf' runs a small open source model (TinyLlama) directly on your machine, no API key required."
-       )
+            ],
+            index=4,  # Set Gemini as the default
+            help="Select the LLM provider to use for analysis. 'local-hf' runs a small open source model (TinyLlama) directly on your machine, no API key required."
+        )
         # Normalize provider value for backend
         if provider_display.startswith("ollama"):
             provider = "ollama"
@@ -243,7 +243,7 @@ def display_upload_section():
     elif camera_image is not None:
         try:
             image = Image.open(camera_image)
-            st.image(image, caption="Camera Plant Image", use_container_width=True)
+            st.image(image, caption="Camera Plant Image", width='stretch')
             st.session_state.uploaded_image = image
             image_to_use = image
         except Exception as e:
@@ -252,7 +252,7 @@ def display_upload_section():
     elif uploaded_file is not None:
         try:
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Plant Image", use_container_width=True)
+            st.image(image, caption="Uploaded Plant Image", width='stretch')
             st.session_state.uploaded_image = image
             image_to_use = image
         except Exception as e:
