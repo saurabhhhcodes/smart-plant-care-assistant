@@ -61,6 +61,8 @@ Our plant analysis system provides confidence scores for all predictions:
 
 ## 🎯 Usage
 
+## 🎯 Usage
+
 1. Run the Streamlit app:
    ```bash
    streamlit run streamlit_app.py
@@ -77,6 +79,8 @@ Our plant analysis system provides confidence scores for all predictions:
 6. View analysis results with confidence scores
 
 7. Chat with the AI assistant for personalized care advice
+
+## 🤖 Supported LLM Providers
 
 ## 🤖 Supported LLM Providers
 
