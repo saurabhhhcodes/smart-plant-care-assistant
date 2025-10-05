@@ -149,7 +149,7 @@ class PlantCareAgent:
         elif self.provider == "gemini":
             if ChatGoogleGenerativeAI is not None:
                return ChatGoogleGenerativeAI(
-                   model="models/gemini-1.5-pro-latest",  # latest Gemini model as of 2025
+                   model="gemini-1.5-pro-latest",  # latest Gemini model as of 2025
                    google_api_key=self.api_key,
                    temperature=0.7,
                    client_options={"api_endpoint": "generativelanguage.googleapis.com"},
@@ -309,7 +309,6 @@ class PlantCareAgent:
         try:
             # Set a flag to indicate a vision model is needed
             self._is_vision_request = True
-            self.llm = self._initialize_llm()  # Re-initialize LLM to select a vision model if needed
             # Create a prompt for the LLM
             prompt = "Identify the plant species in this image. Provide the common and scientific name."
             
@@ -328,9 +327,8 @@ class PlantCareAgent:
         except Exception:
             return "Could not identify plant species."
         finally:
-            # Reset the flag and re-initialize to the default model
+            # Reset the flag
             self._is_vision_request = False
-            self.llm = self._initialize_llm()
 
     def _generate_care_recommendations(self, health_analysis: Dict, disease_analysis: Dict, species: str) -> List[str]:
         """Generate care recommendations using the LLM.

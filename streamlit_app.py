@@ -234,7 +234,7 @@ def display_upload_section():
     elif camera_image is not None:
         try:
             image = Image.open(camera_image)
-            st.image(image, caption="Camera Plant Image", width='stretch')
+            st.image(image.decode('utf-8'), caption="Camera Plant Image", width='stretch')
             st.session_state.uploaded_image = image
             image_to_use = image
         except Exception as e:
