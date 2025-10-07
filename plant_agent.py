@@ -150,7 +150,7 @@ class PlantCareAgent:
         elif self.provider == "gemini":
             if ChatGoogleGenerativeAI is not None:
                return ChatGoogleGenerativeAI(
-                   model="gemini-1.0-pro",
+                   model="gemini-1.5-pro-latest",
                    google_api_key=self.api_key,
                    temperature=0.7
                )
