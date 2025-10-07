@@ -151,9 +151,7 @@ class PlantCareAgent:
                return ChatGoogleGenerativeAI(
                    model="gemini-pro",
                    google_api_key=self.api_key,
-                   temperature=0.7,
-                   client_options={"api_endpoint": "generativelanguage.googleapis.com"},
-                   transport="rest",
+                   temperature=0.7
                )
             else:
                 raise ImportError("ChatGoogleGenerativeAI is not available. Please install langchain_google_genai.")
