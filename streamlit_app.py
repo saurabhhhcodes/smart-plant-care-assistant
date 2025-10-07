@@ -478,6 +478,3 @@ def display_packages():
             for feature in package["features"]:
                 st.markdown(f"- {feature}")
             st.link_button("Subscribe", package["payment_link"])
-
-if __name__ == "__main__":
-    main()
