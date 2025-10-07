@@ -69,6 +69,7 @@ class PlantCareAgent:
         self.analyzer = PlantImageAnalyzer()
     
     def _initialize_llm(self):
+        # Force update
         # Local Hugging Face Transformers (no API key, open source, in-process)
         if self.provider == "local-hf":
             if pipeline is not None and AutoModelForCausalLM is not None and AutoTokenizer is not None:
