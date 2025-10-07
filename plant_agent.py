@@ -69,7 +69,7 @@ class PlantCareAgent:
         self.analyzer = PlantImageAnalyzer()
     
     def _initialize_llm(self):
-        # Force update
+        # Force update a third time
         # Local Hugging Face Transformers (no API key, open source, in-process)
         if self.provider == "local-hf":
             if pipeline is not None and AutoModelForCausalLM is not None and AutoTokenizer is not None:
@@ -150,7 +150,7 @@ class PlantCareAgent:
         elif self.provider == "gemini":
             if ChatGoogleGenerativeAI is not None:
                return ChatGoogleGenerativeAI(
-                   model="gemini-1.5-pro-latest",
+                   model="gemini-pro",
                    google_api_key=self.api_key,
                    temperature=0.7
                )
